@@ -1,1 +1,28 @@
+name: CI Workflow
 
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  Image_build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set short git commit SHA
+        run : |
+          calculatedSha=$(git rev-parse --short ${{ github.sha }})
+          echo "SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
+
+      - name: Build of docker image
+        run : |
+          docker build -t terezabisharyan/simple-nodejs:v0.1.0 .
+
+      - name: Push image to DockerHub
+        run : |
+          docker login -u terezabisharyan -p ${{ secrets.DOCKER_HUB_PSW}}
+          docker push terezabisharyan/simple-nodejs:${{env.SHORT_SHA}}
+    
