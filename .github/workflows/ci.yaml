@@ -19,7 +19,7 @@ jobs:
 
       - name: Build of docker image
         run : |
-          docker build -t terezabisharyan/simple-nodejs:v0.1.0 .
+          docker build -t terezabisharyan/simple-nodejs:v0.1.0 ./app/
 
       - name: Push image to DockerHub
         run : |
