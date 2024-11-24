@@ -1,1 +1,56 @@
+name: CD Workflow
 
+on:
+  workflow_run:
+    workflows: [CD Workflow]
+    types:
+      completed
+
+jobs:
+  Change-image-tag-and-deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set short git commit SHA
+        run : |
+          calculatedSha=$(git rev-parse --short ${{ github.sha }})
+          echo "SHORT_SHA_OTHER=$calculatedSha" >> $GITHUB_ENV  
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'Tereza'
+          git config --global user.email 'an3146073@gmail.com'
+
+      - name: Setup SSH
+        uses: MrSquaare/ssh-setup-action@v1
+        with:
+          host: github.com
+          private-key: ${{ secrets.PRIV_KEY }}
+          private-key-name: github
+          
+      - name: Clone target repository
+        run: git clone git@github.com:tereza-arta/back-diff.git
+
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/download/v4.31.2/yq_linux_amd64 -O /usr/local/bin/yq
+          sudo chmod +x /usr/local/bin/yq   
+
+      - name: Update YAML file with yq
+        working-directory: back-diff
+        run: |
+          yq '.spec.template.spec.containers.[0].image = "terezabisharyan/simple-nodejs:${{env.SHORT_SHA_OTHER}}"' -i example-app/deploy.yml 
+
+      - name: Commit and Push Changes
+        working-directory: back-diff
+        env:
+          GITHUB_TOKEN: ${{ secrets.DOCKER_HUB_PSW }}
+        run: |
+          git add example-app/deploy.yml
+          git commit -m "Update image in k8s deployment"
+          git push origin main
+      
