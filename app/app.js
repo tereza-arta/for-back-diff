@@ -2,7 +2,7 @@ const http = require('http')
 const port = 3000
 
 const server = http.createServer(function(req, res) {
-  res.write('I served from Node.js, by port ' + process.argv[2])
+  res.write('I served by Node.js, with cli argument: ' + process.argv[2])
   res.end()
 })
 
