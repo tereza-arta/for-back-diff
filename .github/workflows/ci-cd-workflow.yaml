@@ -43,6 +43,9 @@ jobs:
       - name: Clone target repository
         run: git clone git@github.com:tereza-arta/back-diff.git
 
+      - name: Set Short Git SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Install yq
         run: |
           sudo wget https://github.com/mikefarah/yq/releases/download/v4.31.2/yq_linux_amd64 -O /usr/local/bin/yq
@@ -51,7 +54,9 @@ jobs:
       - name: Update YAML file with yq
         working-directory: back-diff
         run: |
-          yq '.spec.template.spec.containers.[0].image = "terezabisharyan/simple-nodejs:${GITHUB_SHA::7}"' -i example-app/deploy.yml 
+          yq '.spec.template.spec.containers.[0].image = "terezabisharyan/simple-nodejs:${SHORT_SHA}"' -i example-app/deploy.yml
+          env:
+          SHORT_SHA: ${{ env.SHORT_SHA }}
 
       - name: Commit and Push Changes
         working-directory: back-diff
