@@ -46,11 +46,6 @@ jobs:
       - name: Set Short Git SHA
         run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
-      - name: Install yq
-        run: |
-          sudo wget https://github.com/mikefarah/yq/releases/download/v4.31.2/yq_linux_amd64 -O /usr/local/bin/yq
-          sudo chmod +x /usr/local/bin/yq   
-
       - name: Update YAML file with yq
         working-directory: back-diff
         run: |
