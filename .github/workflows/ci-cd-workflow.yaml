@@ -56,7 +56,7 @@ jobs:
         run: |
           yq '.spec.template.spec.containers.[0].image = "terezabisharyan/simple-nodejs:${SHORT_SHA}"' -i example-app/deploy.yml
           env:
-          SHORT_SHA: ${{ env.SHORT_SHA }}
+            SHORT_SHA: ${{ env.SHORT_SHA }}
 
       - name: Commit and Push Changes
         working-directory: back-diff
