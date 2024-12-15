@@ -12,9 +12,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Build of docker image
+      - name: Build and tag of docker image
         run : |
           docker build -t terezabisharyan/simple-nodejs:${GITHUB_SHA::7} ./app/
+
+      - name: Test newly created build image
+        run: docker run --rm -d -p 3000:3000 --name cnt terezabisharyan/simple-nodejs:${GITHUB_SHA::7} 111
 
       - name: Push image to DockerHub
         run : |
