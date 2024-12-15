@@ -17,9 +17,10 @@ jobs:
           docker build -t terezabisharyan/simple-nodejs:${GITHUB_SHA::7} ./app/
 
       - name: Test newly created build image
-        run: docker run --rm -d -p 3000:3000 --name cnt terezabisharyan/simple-nodejs:${GITHUB_SHA::7} 111
+        run : docker run --rm -d -p 3000:3000 --name cnt terezabisharyan/simple-nodejs:${GITHUB_SHA::7} 111
 
       - name: Push image to DockerHub
+        if  : success()
         run : |
           docker login -u terezabisharyan -p ${{ secrets.DOCKER_HUB_PSW}}
           docker push terezabisharyan/simple-nodejs:${GITHUB_SHA::7}
@@ -44,10 +45,10 @@ jobs:
           private-key-name: github
           
       - name: Clone target repository
-        run: git clone git@github.com:tereza-arta/deploy-node-app.git
+        run : git clone git@github.com:tereza-arta/deploy-node-app.git
 
       - name: Set Short Git SHA
-        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+        run : echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Update YAML file with yq
         working-directory: deploy-node-app
